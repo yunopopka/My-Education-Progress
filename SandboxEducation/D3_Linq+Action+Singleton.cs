@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Collections.Generic;
 
+// Последнее на сегодня - устал от недосыпа
+
 List<Target> targets = new List<Target>();
 Sensor sensor = new Sensor();
 targets.Add(new Target("Dodo",20));
