@@ -1,8 +1,10 @@
+// не удачная попытка написать хороший итоговый код модуля 1
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 Point2D point3D = new Point2D(10,5);
-Faction factRed = Faction.Red; // И как это присваивать
+Faction factRed = Faction.Red; 
 
 ArenaManager.ArenaManage.AliveUnits.Add(new Unit("Brok",factRed,point3D));
 public struct Point2D
@@ -38,7 +40,7 @@ public class ArenaManager
     public List<Unit> AliveUnits = new List<Unit>();
     private ArenaManager() { }
 
-    public Unit? GetClosestEnemy(Unit request) // Забыл про способ написания методов где нужно возвращать что либо - записать
+    public Unit? GetClosestEnemy(Unit request) 
     {
         List<Unit> Enemies = AliveUnits.Where(u => request._faction != u._faction).ToList();
 
@@ -111,7 +113,7 @@ public class SearchState : State
 {
     public void Action(Unit unit)
     {
-        Unit? unit2 = ArenaManager.ArenaManage.GetClosestEnemy(unit); //this не работает
+        Unit? unit2 = ArenaManager.ArenaManage.GetClosestEnemy(unit); 
         if(unit2 != null)
         {
             unit.ChangeState(new AttackState(unit2));
@@ -124,7 +126,7 @@ public class AttackState : State
      private readonly Unit _unit;
     public AttackState(Unit unit)
     {
-        _unit = unit; // Почему я должен лезть в гугл, мы такого не разбирали и близко и я без понятия как возвращать юнит , readonly впервые вижу
+        _unit = unit; 
     }
     public void Action(Unit unit)
     {
