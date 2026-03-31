@@ -30,7 +30,7 @@ public class CubeEngine : MonoBehaviour
             }
             else { Debug.Log("Here is not anomalies"); }
         }
-
+// Не обращайте внимание на коменты от ии, изначально писал функцию я но сделал чуток неверно, поэтому тут просто замененная версия
 
         // 1. ПРОВЕРКА СОСТОЯНИЯ: Мы сломаны?
         if (isOverheated)
