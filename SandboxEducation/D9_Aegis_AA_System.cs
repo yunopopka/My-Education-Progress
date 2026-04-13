@@ -1,96 +1,81 @@
-// ИИ чуток  поправил но на 90% логика написана мною, споткнулся в парочке ошибок но ничего, исправим
-
+using System.Linq;
 using UnityEngine;
 
-public class HeavyGunship : MonoBehaviour
+public class Aegis : MonoBehaviour
 {
-    public Transform player;
-    public Transform guardPoint;
+    public Transform[] allEnemies;
 
-    public float chaseRadius = 20f;
-    public float attackRadius = 10f;
+    public float scanRadius = 30f;
+    public float turnSpeed = 5f;
+    public GameObject missilePrefab;
 
-    public float moveSpeed = 8f;
-    public float turnSpeed = 4f;
-
-    public GameObject misslePrefab;
     public Transform firePoint;
+    public float fireRate = 1f;
 
-    public float fireRate = 1.5f;
-
+    private Transform currentTarget;
     private float fireTimer;
-    private bool IsChasing = false;
-    private bool IsAttack = false;
+    private float radarTimer;
+
+    private Quaternion CurrentAngle;
+
+    private void Start()
+    {
+        CurrentAngle = transform.rotation;
+    }
 
     private void Update()
     {
-        // 1. МОЗГ: Сначала анализируем обстановку и ставим флажки
-        float dist = Vector3.Distance(transform.position, player.position);
-
-        if (dist > chaseRadius)
+        // 1. Медленный радар (оптимизация)
+        radarTimer -= Time.deltaTime;
+        if(radarTimer <= 0)
         {
-            IsChasing = false;
-            IsAttack = false;
-        }
-        else if (dist > attackRadius && dist <= chaseRadius) // Добавил <= для точности
-        {
-            IsChasing = true;
-            IsAttack = false;
-        }
-        else // dist <= 10
-        {
-            IsChasing = true;
-            IsAttack = true;
+            Scan();
+            radarTimer = 0.5f; 
         }
 
-        // 2. МЫШЦЫ: Действуем согласно флажкам
-        GuardAndChase();
-
-        if (IsAttack == true) // Исправление бага бомбардировщика
-        {
-            Attack();
+        // 2. Стейт-машина (Стрелочник)
+        if (currentTarget != null) 
+        { 
+            Attack(); 
+        }
+        else 
+        { 
+            // Возврат на базу, если нет цели
+            transform.rotation = Quaternion.Slerp(transform.rotation, CurrentAngle, turnSpeed * Time.deltaTime); 
         }
     }
 
-    private void GuardAndChase()
+    private void Scan()
     {
-        Vector3 CurrentPosition;
-
-        // Выбираем цель
-        if (IsChasing == false)
-        {
-            CurrentPosition = guardPoint.position;
-        }
-        else
-        {
-            CurrentPosition = player.position;
-        }
-
-        // Движение (только если не атакуем)
-        if (IsAttack == false)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, CurrentPosition, moveSpeed * Time.deltaTime);
-        }
-
-        // Поворот
-        Vector3 PointVector = CurrentPosition - transform.position;
-
-        // Защита от нулевого вектора (если долетели до базы)
-        if (PointVector != Vector3.zero)
-        {
-            Quaternion CurrentVector = Quaternion.LookRotation(PointVector);
-            transform.rotation = Quaternion.Slerp(transform.rotation, CurrentVector, turnSpeed * Time.deltaTime);
-        }
+        // Идеальный LINQ-запрос: Фильтруем -> Фильтруем -> Сортируем -> Берем
+        currentTarget = allEnemies
+            .Where(e => e != null) // Отсекаем призраков
+            .Where(e => Vector3.Distance(transform.position, e.position) <= scanRadius) // Отсекаем далеких
+            .OrderBy(e => Vector3.Distance(transform.position, e.position)) // Сортируем по близости
+            .FirstOrDefault(); // Берем первого в списке
     }
 
     private void Attack()
     {
+        // Наведение
+        Vector3 directionToTarget = currentTarget.position - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+
+        // Стрельба
         fireTimer -= Time.deltaTime;
 
-        if (fireTimer <= 0)
+        if(fireTimer <= 0)
         {
-            Instantiate(misslePrefab, firePoint.position, firePoint.rotation);
+            Instantiate(missilePrefab, firePoint.position, firePoint.rotation);
             fireTimer = fireRate;
+        }
+
+        // Защита от выхода из зоны поражения
+        if(Vector3.Distance(transform.position, currentTarget.position) >= scanRadius) 
+        { 
+            currentTarget = null; 
         }
     }
 }
