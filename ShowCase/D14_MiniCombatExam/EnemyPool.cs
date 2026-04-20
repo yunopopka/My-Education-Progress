@@ -1,0 +1,33 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+public class EnemyPool : MonoBehaviour
+{
+    public GameObject EnemyPrefab;
+    public int poolSize = 30;
+
+    private List<GameObject> pool = new List<GameObject>();
+
+    private void Start()
+    {
+        for(int i = 0; i < poolSize; i++)
+        {
+            GameObject obj = Instantiate(EnemyPrefab);
+            obj.SetActive(false);
+            pool.Add(obj);
+        }
+    }
+
+    public GameObject GetPooledEnemy()
+    {
+        for(int i = 0; i < pool.Count; i++)
+        {
+            if (!pool[i].activeInHierarchy)
+            {
+                return pool[i];
+            }
+        }
+
+        return null;
+    }
+}
