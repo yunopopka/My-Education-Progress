@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+// Тут полная генерация от ИИ, больше для меня что бы иметь шпаргалку
 // 1. Приказ (вместо ручного ввода)
 public struct MoveCommand : IComponentData
 {
