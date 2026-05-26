@@ -2,7 +2,7 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Transforms;
 
-// Элемент массива
+
 public struct DamageBufferElement : IBufferElementData
 {
     public float DamageValue;
