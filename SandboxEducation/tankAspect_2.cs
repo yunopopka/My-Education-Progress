@@ -10,7 +10,6 @@ public struct TankStats : IComponentData
     public float Acceleration;
     public float MaxSpeed;
     public float TurnSpeed;
-    // Тот самый переключатель!
     // true = разворот на месте (НАТО). false = поворот только в движении (СССР)
     public bool CanPivotOnSpot;
 }
